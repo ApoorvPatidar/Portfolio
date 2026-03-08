@@ -1,18 +1,8 @@
 {
-  "headers": [
-    {
-      "source": "/assets/:path*",
-      "headers": [
-        { "key": "Accept-Ranges", "value": "bytes" },
-        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
-      ]
-    }
-  ],
   "rewrites": [
     { "source": "/", "destination": "/main/Home.html" },
     { "source": "/Home.html", "destination": "/main/Home.html" },
     { "source": "/Who.html", "destination": "/main/Who.html" },
-    { "source": "/Work.html", "destination": "/main/Work.html" },
-    { "source": "/assets/:path*", "destination": "/main/assets/:path*" }
+    { "source": "/Work.html", "destination": "/main/Work.html" }
   ]
 }
