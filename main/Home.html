@@ -1238,5 +1238,34 @@ if(typeof gsap!=='undefined')initGSAP();
 }());
 </script>
 
+<!-- ── VIDEO BLOB LOADER ──────────────────────────────────────────────────
+     <video> always fires Range requests to stream MP4. Vercel CDN can
+     return 200 instead of 206 for those, silently breaking playback.
+     Fix: fetch each video as a plain GET → Blob → blob: URL.
+     The video element then reads from memory — zero range requests.
+──────────────────────────────────────────────────────────────────────── -->
+<script>
+(function () {
+  'use strict';
+  document.querySelectorAll('video').forEach(function (v) {
+    var src = (v.querySelector('source') || {}).src;
+    if (!src) return;
+    fetch(src)
+      .then(function (r) { if (!r.ok) throw r.status; return r.blob(); })
+      .then(function (blob) {
+        var url = URL.createObjectURL(blob);
+        v.src = url;
+        v.load();
+        v.play().catch(function () {});
+      })
+      .catch(function () {
+        /* fetch failed — fall back to the original src and let browser try */
+        v.src = src;
+        v.load();
+      });
+  });
+}());
+</script>
+
 </body>
 </html>
