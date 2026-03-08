@@ -1,0 +1,9 @@
+{
+  "rewrites": [
+    { "source": "/", "destination": "/main/Home.html" },
+    { "source": "/Home.html", "destination": "/main/Home.html" },
+    { "source": "/Who.html", "destination": "/main/Who.html" },
+    { "source": "/Work.html", "destination": "/main/Work.html" },
+    { "source": "/assets/:path*", "destination": "/main/assets/:path*" }
+  ]
+}
