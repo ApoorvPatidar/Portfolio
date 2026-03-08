@@ -1,0 +1,1728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Apoorv Patidar — Who??</title>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,600;1,700&family=DM+Sans:wght@300;400;500&family=Playfair+Display:ital,wght@1,700&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --black: #080808;
+  --white: #f0ece4;
+  --accent: #c8ff00;
+  --muted: #444;
+  --border: rgba(240,236,228,0.07);
+}
+
+html { scroll-behavior: auto; }
+body {
+  background: var(--black);
+  color: var(--white);
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 300;
+  overflow-x: hidden;
+  cursor: none;
+}
+
+/* ─── PROGRESS BAR ─── */
+#progress-bar {
+  position: fixed;
+  top: 0; left: 0;
+  height: 2px;
+  width: 0%;
+  background: var(--accent);
+  z-index: 99998;
+}
+
+/* ─── CURSOR ─── */
+.cursor {
+  width: 10px; height: 10px;
+  background: var(--accent);
+  border-radius: 50%;
+  position: fixed; top: 0; left: 0;
+  pointer-events: none;
+  z-index: 9999;
+  mix-blend-mode: difference;
+  will-change: transform;
+}
+.cursor-follower {
+  width: 38px; height: 38px;
+  border: 1px solid rgba(200,255,0,0.35);
+  border-radius: 50%;
+  position: fixed; top: 0; left: 0;
+  pointer-events: none;
+  z-index: 9998;
+  will-change: transform;
+  transition: width 0.35s cubic-bezier(.16,1,.3,1), height 0.35s cubic-bezier(.16,1,.3,1), border-color 0.3s;
+}
+.cursor-follower.hover { width: 72px; height: 72px; border-color: rgba(200,255,0,0.7); }
+
+/* ─── NAV ─── */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 28px 48px;
+  pointer-events: none;
+}
+nav > * { pointer-events: all; }
+body.nav-open nav { opacity: 0; pointer-events: none; }
+
+.nav-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-weight: 700;
+  font-size: clamp(1.5rem, 3.5vw, 3rem);
+  color: var(--white);
+  text-decoration: none;
+  line-height: 0.95;
+  text-align: center;
+}
+.nav-logo-sub {
+  display: block;
+  font-family: 'DM Sans', sans-serif;
+  font-style: normal;
+  font-size: 11px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  opacity: 0.4;
+  margin-top: 4px;
+  font-weight: 500;
+}
+.nav-back {
+  position: fixed;
+  top: 32px; left: 36px;
+  z-index: 1001;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: rgba(240,236,228,0.4);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: color 0.2s;
+  cursor: none;
+}
+.nav-back:hover { color: var(--accent); }
+
+/* ─── NAV OVERLAY ─── */
+#nav-overlay {
+  position: fixed; inset: 0;
+  z-index: 999;
+  background: #0d0f0e;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  opacity: 0; transform: translateY(-100%);
+  pointer-events: none; overflow: hidden;
+  isolation: isolate;
+  transition: opacity 0.5s ease, transform 1.05s cubic-bezier(.16,1,.3,1);
+}
+#nav-overlay::before {
+  content: ''; position: absolute;
+  inset: 0; z-index: 0; pointer-events: none;
+  opacity: 0.07; background-repeat: repeat;
+  background-size: 256px 256px; mix-blend-mode: screen;
+}
+body.nav-open #nav-overlay { opacity: 1; transform: translateY(0); pointer-events: all; }
+#nav-overlay::after {
+  content: ''; position: absolute;
+  width: 600px; height: 600px; border-radius: 50%;
+  border: 1px solid rgba(200,255,0,0.05);
+  top: 50%; left: 50%; transform: translate(-50%,-50%);
+  pointer-events: none;
+}
+.nav-overlay-links { list-style: none; text-align: center; z-index: 1; }
+.nav-overlay-links li { overflow: hidden; line-height: 1; }
+.nav-overlay-links a {
+  display: block; position: relative;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(72px, 12vw, 130px);
+  color: var(--white); text-decoration: none;
+  text-transform: uppercase; letter-spacing: 0.02em;
+  line-height: 1.05; padding: 4px 0;
+  transform: translateY(110%);
+  transition: transform 0.9s cubic-bezier(.16,1,.3,1), color 0.2s ease;
+}
+.nav-overlay-links a::after {
+  content: attr(data-text); position: absolute; inset: 0;
+  color: transparent; -webkit-text-stroke: 2px var(--accent);
+  opacity: 0; pointer-events: none; transition: opacity 0.2s ease;
+}
+body.nav-open .nav-overlay-links a { transform: translateY(0); }
+.nav-overlay-links li:nth-child(1) a { transition-delay: 0.15s; }
+.nav-overlay-links li:nth-child(2) a { transition-delay: 0.22s; }
+.nav-overlay-links li:nth-child(3) a { transition-delay: 0.29s; }
+.nav-overlay-links a:hover { color: transparent; }
+.nav-overlay-links a:hover::after { opacity: 1; }
+.nav-overlay-socials {
+  position: absolute; bottom: 40px; left: 50%;
+  transform: translateX(-50%);
+  display: flex; gap: 12px; opacity: 0; z-index: 1;
+  transition: opacity 0.4s ease 0.4s;
+}
+body.nav-open .nav-overlay-socials { opacity: 1; }
+.nav-social-btn {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: rgba(200,255,0,0.06);
+  border: 1px solid rgba(200,255,0,0.15);
+  display: flex; align-items: center; justify-content: center;
+  text-decoration: none; color: var(--white);
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+  cursor: none;
+}
+.nav-social-btn:hover { background: var(--accent); border-color: var(--accent); color: var(--black); }
+
+.nav-menu-btn {
+  position: fixed; top: 28px; right: 36px;
+  z-index: 1001; width: 52px; height: 52px;
+  border-radius: 50%;
+  background: rgba(200,255,0,0.12);
+  border: 1px solid rgba(200,255,0,0.2);
+  cursor: none; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 6px; padding: 0;
+  transition: background 0.3s, transform 0.3s, border-color 0.3s;
+}
+.nav-menu-btn:hover { background: var(--accent); border-color: var(--accent); transform: scale(1.08); }
+.nav-menu-btn:hover span { background: var(--black); }
+.nav-menu-btn span {
+  display: block; width: 20px; height: 1.5px;
+  background: var(--white); border-radius: 2px;
+  transition: transform 0.4s cubic-bezier(.16,1,.3,1), opacity 0.3s;
+  transform-origin: center;
+}
+body.nav-open .nav-menu-btn span:nth-child(1) { transform: translateY(7.5px) rotate(45deg); }
+body.nav-open .nav-menu-btn span:nth-child(2) { transform: translateY(-7.5px) rotate(-45deg); }
+
+/* ═══════════════ HERO ═══════════════ */
+.who-hero {
+  position: relative;
+  height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+  text-align: center;
+}
+.tree-stage {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+.who-hero-vignette {
+  position: absolute; inset: 0; z-index: 1;
+  background: radial-gradient(ellipse 80% 70% at 50% 50%,
+    transparent 0%, rgba(8,8,8,0.55) 60%, rgba(8,8,8,0.92) 100%);
+}
+.who-hero-content {
+  position: relative; z-index: 2;
+  display: flex; flex-direction: column; align-items: center;
+}
+.who-label {
+  font-size: clamp(0.7rem, 1.2vw, 0.95rem);
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 24px;
+  opacity: 0;
+}
+.who-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(5rem, 15vw, 15rem);
+  line-height: 0.88;
+  color: var(--accent);
+  letter-spacing: 0.02em;
+  position: relative;
+  opacity: 0;
+}
+.who-title .line{display:block;overflow:hidden}
+.who-title .line-inner{display:block;transform:translateY(100%)}
+.who-lines {
+  position: absolute;
+  right: -80px; top: 10px;
+  display: flex; flex-direction: column; gap: 6px;
+  opacity: 0;
+}
+.who-line {
+  width: 60px; height: 2px;
+  background: var(--accent);
+  transform-origin: left center;
+  border-radius: 2px;
+}
+.who-sub {
+  margin-top: 28px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: clamp(0.75rem, 1.5vw, 1rem);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(240,236,228,0.5);
+  max-width: 640px;
+  line-height: 1.7;
+  opacity: 0;
+}
+.who-scroll {
+  position: absolute;
+  bottom: 40px; left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  opacity: 0;
+}
+.who-scroll span {
+  font-size: 0.6rem; letter-spacing: 0.3em;
+  text-transform: uppercase; opacity: 0.3;
+}
+.scroll-line {
+  width: 1px; height: 50px;
+  background: linear-gradient(to bottom, rgba(200,255,0,0.5), transparent);
+  animation: scrollPulse 2s ease infinite;
+}
+
+/* ─── floating deco symbols ─── */
+.hero-deco{position:absolute;z-index:1;color:var(--accent);font-size:clamp(1.4rem,3vw,2.8rem);opacity:0;pointer-events:none;will-change:transform}
+
+/* ═══════════════ AT A GLANCE ═══════════════ */
+.glance-section {
+  padding: 130px 48px 80px;
+  border-top: 1px solid var(--border);
+}
+.glance-inner { max-width: 1200px; margin: 0 auto; }
+.glance-label {
+  font-size: 0.62rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 16px;
+  opacity: 0;
+}
+.glance-heading {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(3rem, 5vw, 5rem);
+  line-height: 0.95;
+  overflow: hidden;
+  margin-bottom: 80px;
+}
+.glance-heading-inner { display: block; transform: translateY(100%); }
+
+.glance-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.glance-stat {
+  padding: 64px 48px;
+  border-right: 1px solid var(--border);
+  opacity: 0;
+  transform: translateY(30px);
+  background: rgba(240,236,228,0.03);
+  transition: background 600ms ease;
+}
+.glance-stat:hover { background: rgba(200,255,0,0.04); }
+.glance-stat:last-child { border-right: none; }
+.glance-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(5rem, 9vw, 8rem);
+  line-height: 1;
+  color: var(--accent);
+}
+.glance-num .suffix { color: var(--white); font-size: 0.6em; }
+.glance-desc {
+  margin-top: 12px;
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(240,236,228,0.35);
+  line-height: 1.6;
+}
+
+/* ── SLOT-MACHINE TICKER ── */
+.count-up {
+  display: inline-flex;
+  vertical-align: bottom;
+}
+.digit-col {
+  overflow: hidden;
+  height: 1em;
+  display: block;
+}
+.digit-strip {
+  display: flex;
+  flex-direction: column;
+  will-change: transform;
+}
+.digit-strip span {
+  height: 1em;
+  display: flex;
+  align-items: center;
+}
+
+/* ── STAT PROGRESS BAR ── */
+.glance-progress {
+  margin-top: 20px;
+  height: 1px;
+  background: rgba(240,236,228,0.08);
+  position: relative;
+  overflow: hidden;
+}
+.glance-progress-fill {
+  position: absolute;
+  left: 0; top: 0;
+  height: 100%;
+  width: 0%;
+  background: var(--accent);
+}
+
+/* ═══════════════ ABOUT ME ═══════════════ */
+.aboutme-section {
+  padding: 100px 48px 130px;
+  border-top: 1px solid var(--border);
+}
+.aboutme-inner {
+  max-width: 1200px; margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+}
+.aboutme-label {
+  font-size: 0.62rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 20px;
+  opacity: 0;
+}
+.aboutme-heading {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(2.5rem, 4.5vw, 4.5rem);
+  line-height: 0.95;
+  margin-bottom: 28px;
+  overflow: hidden;
+}
+.aboutme-heading-inner { display: block; transform: translateY(100%); }
+.aboutme-accent { color: var(--accent); }
+.aboutme-body {
+  font-size: 0.95rem;
+  line-height: 1.9;
+  color: rgba(240,236,228,0.5);
+  max-width: 460px;
+  opacity: 0;
+}
+.aboutme-body p + p { margin-top: 1.2em; }
+.aboutme-tags {
+  display: flex; flex-wrap: wrap; gap: 10px;
+  margin-top: 28px; opacity: 0;
+}
+.aboutme-tag {
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  border: 1px solid rgba(200,255,0,0.25);
+  padding: 6px 14px;
+}
+
+/* ═══════════════════════════════════════════
+   VINYL PLAYER — COMPLETE REDESIGN
+═══════════════════════════════════════════ */
+.vinyl-wrap {
+  --vinyl-size: 320px;
+  --sleeve-size: 320px;
+  --vinyl-cover-size: 132px;
+  --vinyl-start-x: 28px;
+  --vinyl-max-x: 160px;
+  --vinyl-arm-width: 112px;
+  --vinyl-arm-thickness: 4px;
+  --vinyl-arm-right-offset: 320px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 500px;
+  opacity: 0;
+}
+
+
+/* Disc */
+.vinyl-disc {
+  width: var(--vinyl-size); height: var(--vinyl-size);
+  border-radius: 50%;
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  will-change: transform;
+}
+.vinyl-disc-bg {
+  width: 100%; height: 100%;
+  border-radius: 50%;
+  background: conic-gradient(
+    #1a1a1a 0deg, #111 30deg, #222 60deg, #111 90deg,
+    #1a1a1a 120deg, #0d0d0d 150deg, #222 180deg,
+    #111 210deg, #1a1a1a 240deg, #0d0d0d 270deg,
+    #222 300deg, #111 330deg, #1a1a1a 360deg
+  );
+  position: absolute; inset: 0; border-radius: 50%;
+}
+.vinyl-grooves {
+  position: absolute; inset: 0; border-radius: 50%;
+  background: repeating-radial-gradient(
+    circle at center,
+    transparent 0px, transparent 4px,
+    rgba(255,255,255,0.015) 4px, rgba(255,255,255,0.015) 5px
+  );
+}
+
+/* ── Disc center label (non-interactive) ── */
+.vinyl-center-label {
+  position: absolute;
+  width: var(--vinyl-cover-size); height: var(--vinyl-cover-size);
+  border-radius: 50%;
+  background: radial-gradient(circle, #1e1e1e 0%, #0d0d0d 100%);
+  border: 2px solid rgba(200,255,0,0.12);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+.vinyl-center-label span {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.1rem;
+  letter-spacing: 0.2em;
+  color: rgba(200,255,0,0.3);
+}
+/* Spindle dot */
+.vinyl-disc::after {
+  content: '';
+  position: absolute;
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--accent);
+  top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  z-index: 3;
+  pointer-events: none;
+}
+
+/* ── SLEEVE — now the interactive album cover ── */
+.vinyl-sleeve {
+  position: absolute;
+  width: var(--sleeve-size);
+  height: var(--sleeve-size);
+  border-radius: 4px;
+  background: #0d0d0d;
+  border: 1px solid rgba(240,236,228,0.07);
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  overflow: hidden;
+  display: flex; align-items: flex-end;
+  box-shadow: -6px 6px 28px rgba(0,0,0,0.6);
+  cursor: none;
+}
+
+/* Full-bleed album art canvas on the sleeve */
+.vinyl-cover-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+  object-fit: cover;
+  filter: grayscale(1) brightness(0.45);
+  transition: filter 0.5s cubic-bezier(.16,1,.3,1);
+  z-index: 0;
+}
+
+.vinyl-cover-band {
+  position: absolute;
+  left: 20px;
+  bottom: 18px;
+  z-index: 1;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.1rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(240,236,228,0.92);
+  text-shadow: 0 2px 14px rgba(0,0,0,0.65);
+  pointer-events: none;
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+
+/* Sound icon overlay — full sleeve, hidden at rest */
+.vinyl-cover-overlay {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(8,8,8,0.38);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  z-index: 2;
+  border-radius: 0;
+}
+.vinyl-cover-overlay svg {
+  width: 48px; height: 48px;
+  fill: var(--accent);
+  filter: drop-shadow(0 0 16px rgba(200,255,0,0.7));
+  transition: transform 0.25s cubic-bezier(.16,1,.3,1);
+}
+.vinyl-cover-overlay svg:hover { transform: scale(1.12); }
+
+/* Icon states */
+.vinyl-cover-overlay .icon-playing { display: none; }
+.vinyl-cover-overlay .icon-sound   { display: block; }
+
+/* ── Hover states ── */
+.vinyl-sleeve.is-hovered .vinyl-cover-canvas {
+  filter: grayscale(0) brightness(1);
+}
+.vinyl-sleeve.is-hovered .vinyl-cover-overlay {
+  opacity: 1;
+}
+.vinyl-sleeve.is-hovered .vinyl-cover-band {
+  opacity: 0.42;
+  transform: translateY(2px);
+}
+
+/* ── Playing states ── */
+.vinyl-sleeve.is-playing .vinyl-cover-canvas {
+  filter: grayscale(0) brightness(0.95);
+}
+.vinyl-sleeve.is-playing .vinyl-cover-overlay {
+  opacity: 1;
+  background: rgba(8,8,8,0.25);
+}
+.vinyl-sleeve.is-playing .vinyl-cover-band {
+  opacity: 0.35;
+}
+.vinyl-sleeve.is-playing .icon-sound   { display: none; }
+.vinyl-sleeve.is-playing .icon-playing { display: block; }
+
+/* Playing border glow */
+.vinyl-sleeve.is-playing {
+  box-shadow: -6px 6px 28px rgba(0,0,0,0.6), 0 0 0 1.5px rgba(200,255,0,0.35), 0 0 32px rgba(200,255,0,0.08);
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* Tonearm */
+.vinyl-arm {
+  position: absolute;
+  top: calc(50% - (var(--sleeve-size) / 2));
+  right: calc(50% - var(--vinyl-arm-right-offset));
+  width: var(--vinyl-arm-width); height: var(--vinyl-arm-thickness);
+  background: rgba(240,236,228,0.15);
+  transform-origin: right center;
+  transform: rotate(-30deg);
+  border-radius: 2px;
+  z-index: 3;
+}
+.vinyl-arm::after {
+  content: '';
+  position: absolute;
+  right: 0; top: -5px;
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: rgba(200,255,0,0.4);
+  border: 1px solid rgba(200,255,0,0.6);
+}
+
+/* ═══════════════ WORDS I GO BY ═══════════════ */
+.words-section {
+  position: relative;
+  padding: 120px 0;
+  overflow: hidden;
+  border-top: 1px solid var(--border);
+}
+.roman-bg {
+  position: absolute; inset: 0; z-index: 0;
+  overflow: hidden;
+}
+.roman-col {
+  position: absolute;
+  bottom: 0;
+  width: 60px;
+  display: flex; flex-direction: column; align-items: center;
+  opacity: 0.04;
+  will-change: transform;
+}
+.roman-col-shaft {
+  width: 18px;
+  background: linear-gradient(to top, rgba(200,255,0,0.6), rgba(200,255,0,0.1));
+  flex: 1;
+}
+.roman-col-cap {
+  width: 50px; height: 20px;
+  background: rgba(200,255,0,0.5);
+  clip-path: polygon(10% 100%, 0 0, 100% 0, 90% 100%);
+}
+.roman-col-base {
+  width: 54px; height: 14px;
+  background: rgba(200,255,0,0.5);
+}
+.roman-arch {
+  position: absolute;
+  top: 0; left: 50%; transform: translateX(-50%);
+  width: 700px; height: 100%;
+  opacity: 0.025;
+  z-index: 0;
+  pointer-events: none;
+}
+.words-inner { position: relative; z-index: 1; }
+.words-header {
+  text-align: center;
+  padding: 0 48px;
+  margin-bottom: 64px;
+}
+.words-label {
+  font-size: 0.62rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 16px;
+  opacity: 0;
+}
+.words-heading {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(3rem, 6vw, 6rem);
+  line-height: 0.95;
+  overflow: hidden;
+}
+.words-heading-inner { display: block; transform: translateY(100%); }
+
+.quotes-track-wrap {
+  overflow: hidden;
+  padding: 20px 0;
+  cursor: grab;
+  user-select: none;
+  touch-action: pan-y;
+}
+.quotes-track-wrap.is-dragging { cursor: grabbing; }
+.quotes-track {
+  display: inline-flex;
+  white-space: nowrap;
+  will-change: transform;
+}
+.quote-card {
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 380px;
+  min-height: 200px;
+  white-space: normal;
+  background: rgba(240,236,228,0.03);
+  border: 1px solid var(--border);
+  padding: 36px 32px;
+  margin: 0 12px;
+  flex-shrink: 0;
+  cursor: none;
+  position: relative;
+  transition: border-color 0.3s, background 0.3s;
+}
+.quote-card:hover {
+  border-color: rgba(200,255,0,0.2);
+  background: rgba(200,255,0,0.02);
+}
+.quote-card::before {
+  content: '"';
+  position: absolute;
+  top: 16px; left: 24px;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 5rem;
+  line-height: 1;
+  color: rgba(200,255,0,0.07);
+  pointer-events: none;
+}
+.quote-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: clamp(1.16rem, 1.15vw, 1.34rem);
+  line-height: 1.68;
+  color: rgba(240,236,228,0.75);
+  margin-bottom: 20px;
+  padding-top: 16px;
+}
+.quote-author {
+  font-size: 0.6rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--accent);
+  opacity: 0.7;
+}
+
+/* ─── FOOTER ─── */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 80px 48px 48px;
+  display: flex; flex-direction: column;
+  align-items: center; gap: 32px; text-align: center;
+}
+.footer-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic; font-weight: 700;
+  font-size: clamp(1.5rem, 3.5vw, 3rem);
+  color: var(--white);
+  letter-spacing: -0.02em; line-height: 1; opacity: 0.9;
+}
+.footer-socials { display: flex; gap: 14px; align-items: center; }
+.footer-social-btn {
+  width: 52px; height: 52px; border-radius: 50%;
+  background: rgba(240,236,228,0.04);
+  border: 1px solid rgba(240,236,228,0.12);
+  display: flex; align-items: center; justify-content: center;
+  text-decoration: none; color: var(--white);
+  transition: background 0.25s, border-color 0.25s, color 0.25s, transform 0.25s;
+  cursor: none;
+}
+.footer-social-btn:hover { background: var(--accent); border-color: var(--accent); color: var(--black); transform: scale(1.1); }
+.footer-social-btn svg { width: 18px; height: 18px; fill: currentColor; }
+.footer-copy { font-size: 0.75rem; letter-spacing: 0.05em; color: rgba(240,236,228,0.75); }
+
+/* ─── KEYFRAMES ─── */
+@keyframes scrollPulse {
+  0%,100% { opacity: 0.4; transform: scaleY(1); }
+  50% { opacity: 1; transform: scaleY(1.1); }
+}
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 900px) {
+  nav { padding: 20px 24px; }
+  .nav-back { left: 20px; top: 24px; }
+  .nav-menu-btn { top: 20px; right: 20px; }
+  .glance-section { padding: 80px 24px 60px; }
+  .glance-stats { grid-template-columns: 1fr; }
+  .glance-stat { border-right: none; border-bottom: 1px solid var(--border); }
+  .aboutme-section { padding: 80px 24px; }
+  .aboutme-inner { grid-template-columns: 1fr; gap: 48px; }
+  .vinyl-wrap {
+    --vinyl-size: 250px;
+    --sleeve-size: 250px;
+    --vinyl-cover-size: 104px;
+    --vinyl-start-x: 22px;
+    --vinyl-max-x: 126px;
+    --vinyl-arm-width: 92px;
+    --vinyl-arm-right-offset: 238px;
+    height: 360px;
+  }
+  footer { gap: 24px; padding: 60px 24px 36px; }
+  .words-header { padding: 0 24px; }
+  .quote-card { width: 300px; }
+}
+</style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+<div class="cursor" id="cursor"></div>
+<div class="cursor-follower" id="cursorFollower"></div>
+
+<!-- Nav overlay -->
+<div id="nav-overlay">
+  <ul class="nav-overlay-links">
+    <li><a href="Home.html" data-text="Home" onclick="closeNav()">Home</a></li>
+    <li><a href="#" data-text="Who??" onclick="closeNav()">Who??</a></li>
+    <li><a href="Work.html" data-text="Work" onclick="closeNav()">Work</a></li>
+  </ul>
+  <div class="nav-overlay-socials">
+    <a href="mailto:apoorvpatidar.ap24@gmail.com" class="nav-social-btn" title="Email">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4C2.9 4 2 4.9 2 6v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+    </a>
+    <a href="https://x.com/Apoorv2431" target="_blank" rel="noopener" class="nav-social-btn" title="Twitter / X">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.742l7.737-8.835L1.254 2.25H8.08l4.253 5.622L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77z"/></svg>
+    </a>
+    <a href="https://www.linkedin.com/in/apoorvpatidar24" target="_blank" rel="noopener" class="nav-social-btn" title="LinkedIn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+    </a>
+  </div>
+</div>
+
+<a href="Home.html" class="nav-back">← Back</a>
+<nav>
+  <a href="Home.html" class="nav-logo">
+    Apoorv Patidar
+    <span class="nav-logo-sub">Build &amp; Deploy</span>
+  </a>
+</nav>
+<button class="nav-menu-btn" id="menuBtn" aria-label="Toggle menu">
+  <span></span>
+  <span></span>
+</button>
+
+<script>
+(function attachFooterSounds(){
+  const shockedSound=new Audio('https://www.myinstants.com/media/sounds/shocked-sound-effect.mp3');
+  shockedSound.preload='auto';
+  function wire(){
+    document.querySelectorAll('.footer-social-btn').forEach(btn=>{
+      btn.addEventListener('click',()=>{shockedSound.currentTime=0;shockedSound.play().catch(()=>{});});
+    });
+  }
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',wire);
+  } else {
+    wire();
+  }
+})();
+
+(function playPendingNavigationSound(){
+  try{
+    const payload=sessionStorage.getItem('pendingNavigationSound');
+    if(!payload)return;
+    sessionStorage.removeItem('pendingNavigationSound');
+    const {url,volume=1}=JSON.parse(payload);
+    if(!url)return;
+    const sound=new Audio(url);
+    sound.volume=volume;
+    sound.play().catch(()=>{});
+  }catch(e){}
+})();
+</script>
+
+<!-- HERO -->
+<section class="who-hero" id="heroSection">
+  <div class="tree-stage" id="treeStage"></div>
+  <div class="who-hero-vignette"></div>
+
+  <!-- floating deco chars -->
+  <div class="hero-deco" style="top:18%;left:6%">↓</div>
+  <div class="hero-deco" style="top:22%;left:12%">↓</div>
+  <div class="hero-deco" style="top:19%;left:18%">↓</div>
+  <div class="hero-deco" style="top:14%;right:8%;font-size:clamp(1rem,2vw,2rem)">◆</div>
+  <div class="hero-deco" style="bottom:24%;right:6%;font-size:clamp(2rem,4vw,3.5rem)">○</div>
+  <div class="hero-deco" style="top:28%;right:12%;width:clamp(60px,8vw,130px);height:3px;background:var(--accent);transform:rotate(-20deg)"></div>
+  <div class="hero-deco" style="top:22%;right:18%;width:clamp(40px,5vw,90px);height:2px;background:var(--accent);transform:rotate(14deg)"></div>
+  <div class="hero-deco" style="top:34%;right:9%;width:clamp(30px,4vw,70px);height:2px;background:var(--accent);transform:rotate(-35deg)"></div>
+  <div class="hero-deco" style="bottom:28%;left:8%;font-size:clamp(1.2rem,2.5vw,2.2rem)">⌇</div>
+
+  <div class="who-hero-content">
+    <p class="who-label" id="whoLabel">Fair Question.</p>
+    <div style="position:relative; display:inline-block;">
+      <h1 class="who-title" id="whoTitle"><span class="line"><span class="line-inner">WHO??</span></span></h1>
+      <div class="who-lines" id="whoLines">
+        <div class="who-line" id="wl1"></div>
+        <div class="who-line" id="wl2"></div>
+        <div class="who-line" id="wl3"></div>
+      </div>
+    </div>
+    <p class="who-sub" id="whoSub">
+      Through AI engineering and systems thinking, I build things that actually work — not prototypes, not demos. Production-grade software with a bias for shipping.
+    </p>
+  </div>
+  <div class="who-scroll" id="whoScroll">
+    <div class="scroll-line"></div>
+    <span>Scroll</span>
+  </div>
+</section>
+
+<!-- AT A GLANCE -->
+<section class="glance-section">
+  <div class="glance-inner">
+    <p class="glance-label" id="glanceLabel">At a Glance</p>
+    <h2 class="glance-heading">
+      <span class="glance-heading-inner" id="glanceHeading">NUMBERS<br>DON'T LIE.</span>
+    </h2>
+    <div class="glance-stats" id="glanceStats">
+      <div class="glance-stat">
+        <div class="glance-num">
+          <span class="count-up" data-target="4">0</span><span class="suffix">+</span>
+        </div>
+        <p class="glance-desc">Years of<br>Doing Things</p>
+        <div class="glance-progress"><div class="glance-progress-fill"></div></div>
+      </div>
+      <div class="glance-stat">
+        <div class="glance-num">
+          <span class="count-up" data-target="11">0</span><span class="suffix">%</span>
+        </div>
+        <p class="glance-desc">Of the world<br>speaks Python.<br>I'm one of them.</p>
+        <div class="glance-progress"><div class="glance-progress-fill"></div></div>
+      </div>
+      <div class="glance-stat">
+        <div class="glance-num">
+          <span class="count-up" data-target="69">0</span>
+        </div>
+        <p class="glance-desc">Is definitely<br>a number.</p>
+        <div class="glance-progress"><div class="glance-progress-fill"></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT ME + VINYL -->
+<section class="aboutme-section">
+  <div class="aboutme-inner">
+    <div class="aboutme-left">
+      <p class="aboutme-label" id="aboutmeLabel">The Person</p>
+      <h2 class="aboutme-heading">
+        <span class="aboutme-heading-inner" id="aboutmeHeading">
+          YEAH, IT'S ME.<br><span class="aboutme-accent">APOORV PATIDAR.</span>
+        </span>
+      </h2>
+      <div class="aboutme-body" id="aboutmeBody">
+        <p>
+          AI Engineer and Software Developer based in New Delhi, India. I build intelligent systems — RAG pipelines, LLM applications, ML models — that go from Jupyter notebook to production without the usual drama.
+        </p>
+        <p>
+          I work across the full stack of AI: from wrangling embeddings in vector databases to deploying containerised services on AWS. If it involves Python, tensors, or an API that needs to actually work under load, that's my territory.
+        </p>
+        <p>
+          I take deadlines seriously. Clean code, honest communication, no hand-holding. When I say I'll ship something, it ships.
+        </p>
+      </div>
+      <div class="aboutme-tags" id="aboutmeTags">
+        <span class="aboutme-tag">LangChain</span>
+        <span class="aboutme-tag">PyTorch</span>
+        <span class="aboutme-tag">AWS</span>
+        <span class="aboutme-tag">Docker</span>
+        <span class="aboutme-tag">FastAPI</span>
+        <span class="aboutme-tag">RAG</span>
+        <span class="aboutme-tag">MLflow</span>
+        <span class="aboutme-tag">CrewAI</span>
+      </div>
+    </div>
+
+    <!-- ── VINYL PLAYER ── -->
+    <div class="vinyl-wrap" id="vinylWrap">
+
+      <!-- Disc — plain, no interaction -->
+      <div class="vinyl-disc" id="vinylDisc">
+        <div class="vinyl-disc-bg"></div>
+        <div class="vinyl-grooves"></div>
+        <!-- Center label (non-interactive) -->
+        <div class="vinyl-center-label">
+          <span>AP</span>
+        </div>
+      </div>
+
+      <!-- Sleeve — THIS is the interactive album cover -->
+      <div class="vinyl-sleeve" id="vinylCover">
+        <!-- Full-bleed album art on canvas -->
+        <canvas class="vinyl-cover-canvas" id="albumCanvas"></canvas>
+        <div class="vinyl-cover-band">Arctic Monkeys</div>
+
+        <!-- Hover overlay with icons -->
+        <div class="vinyl-cover-overlay" id="coverOverlay">
+          <svg class="icon-sound" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+          </svg>
+          <svg class="icon-playing" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Tonearm -->
+      <div class="vinyl-arm"></div>
+    </div>
+  </div>
+</section>
+
+<!-- WORDS I GO BY -->
+<section class="words-section">
+  <div class="roman-bg" id="romanBg"></div>
+  <svg class="roman-arch" viewBox="0 0 700 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M50 600 L50 300 Q50 50 350 50 Q650 50 650 300 L650 600" stroke="rgba(200,255,0,1)" stroke-width="2" fill="none"/>
+    <path d="M100 600 L100 320 Q100 120 350 120 Q600 120 600 320 L600 600" stroke="rgba(200,255,0,1)" stroke-width="1" fill="none" opacity="0.5"/>
+    <line x1="50" y1="600" x2="650" y2="600" stroke="rgba(200,255,0,1)" stroke-width="2"/>
+    <line x1="30" y1="580" x2="670" y2="580" stroke="rgba(200,255,0,1)" stroke-width="1" opacity="0.4"/>
+  </svg>
+  <div class="words-inner">
+    <div class="words-header">
+      <p class="words-label" id="wordsLabel">Words I Go By</p>
+      <h2 class="words-heading">
+        <span class="words-heading-inner" id="wordsHeading">THE AXIOMS.</span>
+      </h2>
+    </div>
+    <div class="quotes-track-wrap">
+      <div class="quotes-track" id="quotesTrack">
+        <div class="quote-card"><p class="quote-text">He who has a why to live can bear almost any how.</p><span class="quote-author">Friedrich Nietzsche</span></div>
+        <div class="quote-card"><p class="quote-text">We suffer more often in imagination than in reality.</p><span class="quote-author">Seneca</span></div>
+        <div class="quote-card"><p class="quote-text">The impediment to action advances action.</p><span class="quote-author">Marcus Aurelius</span></div>
+        <div class="quote-card"><p class="quote-text">Happiness depends upon ourselves.</p><span class="quote-author">Aristotle</span></div>
+        <div class="quote-card"><p class="quote-text">The unexamined life is not worth living.</p><span class="quote-author">Socrates</span></div>
+        <div class="quote-card"><p class="quote-text">Waste no more time arguing what a good man should be. Be one.</p><span class="quote-author">Marcus Aurelius</span></div>
+        <div class="quote-card"><p class="quote-text">Difficulties strengthen the mind, as labor does the body.</p><span class="quote-author">Seneca</span></div>
+        <div class="quote-card"><p class="quote-text">It's not what happens to you, but how you react to it that matters.</p><span class="quote-author">Epictetus</span></div>
+        <div class="quote-card"><p class="quote-text">We are what we repeatedly do. Excellence, then, is not an act, but a habit.</p><span class="quote-author">Aristotle</span></div>
+        <div class="quote-card"><p class="quote-text">It is better to be feared than loved, if you cannot be both.</p><span class="quote-author">Machiavelli</span></div>
+        <div class="quote-card"><p class="quote-text">You have power over your mind — not outside events. Realize this, and you will find strength.</p><span class="quote-author">Marcus Aurelius</span></div>
+        <div class="quote-card"><p class="quote-text">Luck is what happens when preparation meets opportunity.</p><span class="quote-author">Seneca</span></div>
+        <div class="quote-card"><p class="quote-text">First say to yourself what you would be; then do what you have to do.</p><span class="quote-author">Epictetus</span></div>
+        <div class="quote-card"><p class="quote-text">Knowing yourself is the beginning of all wisdom.</p><span class="quote-author">Aristotle</span></div>
+        <div class="quote-card"><p class="quote-text">The wise man does at once what the fool does finally.</p><span class="quote-author">Machiavelli</span></div>
+        <div class="quote-card"><p class="quote-text">That which does not kill us makes us stronger.</p><span class="quote-author">Friedrich Nietzsche</span></div>
+        <div class="quote-card"><p class="quote-text">Wonder is the beginning of wisdom.</p><span class="quote-author">Socrates</span></div>
+        <div class="quote-card"><p class="quote-text">The happiness of your life depends upon the quality of your thoughts.</p><span class="quote-author">Marcus Aurelius</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-name">Apoorv Patidar</div>
+  <div class="footer-socials">
+    <a href="mailto:apoorvpatidar.ap24@gmail.com" class="footer-social-btn" title="Email">
+      <svg viewBox="0 0 24 24"><path d="M20 4H4C2.9 4 2 4.9 2 6v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+    </a>
+    <a href="https://x.com/Apoorv2431" target="_blank" rel="noopener" class="footer-social-btn" title="Twitter / X">
+      <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.742l7.737-8.835L1.254 2.25H8.08l4.253 5.622L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77z"/></svg>
+    </a>
+    <a href="https://www.linkedin.com/in/apoorvpatidar24" target="_blank" rel="noopener" class="footer-social-btn" title="LinkedIn">
+      <svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+    </a>
+  </div>
+  <p class="footer-copy">© 2026, Apoorv Patidar I guess?</p>
+</footer>
+
+<!-- ══ GRAIN ══ -->
+<script>
+(function() {
+  const FRAMES = 10, SIZE = 256;
+  const urls = [];
+  for (let f = 0; f < FRAMES; f++) {
+    const c = document.createElement('canvas');
+    c.width = c.height = SIZE;
+    const ctx = c.getContext('2d');
+    const img = ctx.createImageData(SIZE, SIZE);
+    const d = img.data;
+    for (let i = 0; i < d.length; i += 4) {
+      const v = Math.random() * 255 | 0;
+      d[i] = d[i+1] = d[i+2] = v; d[i+3] = 255;
+    }
+    ctx.putImageData(img, 0, 0);
+    urls.push(c.toDataURL('image/png'));
+  }
+  const kf = urls.map((url, i) => `${(i/FRAMES*100).toFixed(1)}% { background-image: url('${url}'); }`).join('\n  ');
+  const style = document.createElement('style');
+  style.textContent = `
+    #nav-overlay::before { background-image: url('${urls[0]}'); animation: navGrain ${(FRAMES/24).toFixed(3)}s steps(1) infinite; }
+    @keyframes navGrain { ${kf} }
+  `;
+  document.head.appendChild(style);
+})();
+</script>
+
+<!-- ══════════════════════════════════════════════
+     ALBUM COVER ART
+     Loads a local image if available, otherwise draws
+     an original fallback cover matching the track vibe
+══════════════════════════════════════════════ -->
+<script>
+(function drawAlbumArt() {
+  const canvas = document.getElementById('albumCanvas');
+  const COVER_SRC = '/assets/cover.png';
+  const W = 640, H = 640;
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+  const cx = W / 2, cy = H / 2;
+
+  function drawFallback() {
+    const bg = ctx.createLinearGradient(0, 0, 0, H);
+    bg.addColorStop(0, '#060606');
+    bg.addColorStop(0.45, '#0d0d0d');
+    bg.addColorStop(1, '#020202');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, W, H);
+
+    const glow = ctx.createRadialGradient(cx, H * 0.52, 0, cx, H * 0.52, W * 0.46);
+    glow.addColorStop(0, 'rgba(235,240,255,0.14)');
+    glow.addColorStop(0.45, 'rgba(200,255,0,0.05)');
+    glow.addColorStop(1, 'transparent');
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, W, H);
+
+    ctx.save();
+    ctx.strokeStyle = 'rgba(240,236,228,0.86)';
+    ctx.lineWidth = 8;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.beginPath();
+    ctx.moveTo(W * 0.12, H * 0.52);
+    ctx.bezierCurveTo(W * 0.24, H * 0.52, W * 0.28, H * 0.39, W * 0.40, H * 0.39);
+    ctx.bezierCurveTo(W * 0.50, H * 0.39, W * 0.53, H * 0.62, W * 0.64, H * 0.62);
+    ctx.bezierCurveTo(W * 0.76, H * 0.62, W * 0.79, H * 0.46, W * 0.90, H * 0.46);
+    ctx.stroke();
+    ctx.restore();
+
+    ctx.save();
+    ctx.strokeStyle = 'rgba(200,255,0,0.12)';
+    ctx.lineWidth = 2;
+    for (let i = 0; i < 7; i++) {
+      const offset = i * 22;
+      ctx.beginPath();
+      ctx.moveTo(W * 0.12, H * 0.52 + offset);
+      ctx.bezierCurveTo(W * 0.24, H * 0.52 + offset, W * 0.28, H * 0.39 + offset, W * 0.40, H * 0.39 + offset);
+      ctx.bezierCurveTo(W * 0.50, H * 0.39 + offset, W * 0.53, H * 0.62 + offset, W * 0.64, H * 0.62 + offset);
+      ctx.bezierCurveTo(W * 0.76, H * 0.62 + offset, W * 0.79, H * 0.46 + offset, W * 0.90, H * 0.46 + offset);
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    ctx.save();
+    ctx.font = `bold ${Math.round(W * 0.10)}px 'Bebas Neue', Arial, sans-serif`;
+    ctx.fillStyle = 'rgba(240,236,228,0.95)';
+    ctx.textAlign = 'left';
+    ctx.fillText('DO I WANNA', W * 0.08, H * 0.16);
+    ctx.fillText('KNOW?', W * 0.08, H * 0.26);
+    ctx.font = `${Math.round(W * 0.032)}px 'DM Sans', Arial, sans-serif`;
+    ctx.fillStyle = 'rgba(200,255,0,0.75)';
+    ctx.fillText('ARCTIC MONKEYS', W * 0.085, H * 0.32);
+    ctx.restore();
+
+    ctx.save();
+    ctx.strokeStyle = 'rgba(240,236,228,0.12)';
+    ctx.lineWidth = 2;
+    const pad = 22;
+    ctx.strokeRect(pad, pad, W - pad * 2, H - pad * 2);
+    ctx.restore();
+
+    const vignette = ctx.createRadialGradient(cx, cy, W * 0.18, cx, cy, W * 0.82);
+    vignette.addColorStop(0, 'transparent');
+    vignette.addColorStop(1, 'rgba(0,0,0,0.72)');
+    ctx.fillStyle = vignette;
+    ctx.fillRect(0, 0, W, H);
+  }
+
+  const img = new Image();
+  img.onload = () => {
+    ctx.drawImage(img, 0, 0, W, H);
+  };
+  img.onerror = drawFallback;
+  img.src = COVER_SRC;
+})();
+</script>
+
+<!-- ══════════════════════════════════════════════
+     VINYL AUDIO PLAYER LOGIC
+══════════════════════════════════════════════ -->
+<script>
+(function initVinylPlayer() {
+  const cover = document.getElementById('vinylCover');
+  const TRACK_SRC = '/assets/do_i_wanna_know.mp3';
+  const audio = new Audio(TRACK_SRC);
+  audio.preload = 'metadata';
+  audio.loop = true;
+  audio.volume = 0.82;
+
+  let playing = false;
+  let hasAudioSource = true;
+  let hasPointerPosition = false;
+  let pointerX = 0;
+  let pointerY = 0;
+
+  function stopPlayback(reset = false) {
+    playing = false;
+    cover.classList.remove('is-playing');
+    stopAudio(reset);
+  }
+
+  function isPointerOverCover() {
+    if (!hasPointerPosition) return false;
+    const rect = cover.getBoundingClientRect();
+    return pointerX >= rect.left && pointerX <= rect.right && pointerY >= rect.top && pointerY <= rect.bottom;
+  }
+
+  function syncCoverHoverState() {
+    cover.classList.toggle('is-hovered', isPointerOverCover());
+  }
+
+  function syncPlaybackWithPointer() {
+    if (!playing) return;
+    if (!isPointerOverCover()) stopPlayback(true);
+  }
+
+  function startAudio() {
+    audio.play().catch(() => {
+      hasAudioSource = false;
+      stopPlayback();
+    });
+  }
+
+  function stopAudio(reset = false) {
+    audio.pause();
+    if (reset) audio.currentTime = 0;
+  }
+
+  window.addEventListener('pointermove', (event) => {
+    hasPointerPosition = true;
+    pointerX = event.clientX;
+    pointerY = event.clientY;
+    syncCoverHoverState();
+    syncPlaybackWithPointer();
+  }, { passive: true });
+
+  window.addEventListener('scroll', () => {
+    syncCoverHoverState();
+    syncPlaybackWithPointer();
+  }, { passive: true });
+
+  cover.addEventListener('mouseleave', () => {
+    cover.classList.remove('is-hovered');
+    if (playing) stopPlayback(true);
+  });
+
+  cover.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (!hasAudioSource) return;
+
+    if (!playing) {
+      playing = true;
+      cover.classList.add('is-playing');
+      startAudio();
+    } else {
+      stopPlayback();
+    }
+  });
+
+  audio.addEventListener('ended', () => {
+    stopPlayback();
+  });
+})();
+</script>
+
+<!-- ══════════════════════════════════════════════
+     MAIN SCRIPTS (original, unchanged logic)
+══════════════════════════════════════════════ -->
+<script>
+gsap.registerPlugin(ScrollTrigger);
+
+// ─── CURSOR ────────────────────────────────────────────────────
+const cursorEl = document.getElementById('cursor');
+const followerEl = document.getElementById('cursorFollower');
+let mx = 0, my = 0, fx = 0, fy = 0;
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  cursorEl.style.transform = `translate(${mx-5}px,${my-5}px)`;
+});
+(function lerpF() {
+  fx += (mx-fx-19)*0.11; fy += (my-fy-19)*0.11;
+  followerEl.style.transform = `translate(${fx}px,${fy}px)`;
+  requestAnimationFrame(lerpF);
+})();
+document.querySelectorAll('a,button,.quote-card,.vinyl-wrap').forEach(el => {
+  el.addEventListener('mouseenter', () => followerEl.classList.add('hover'));
+  el.addEventListener('mouseleave', () => followerEl.classList.remove('hover'));
+});
+
+// ─── NAV ──────────────────────────────────────────────────────
+const menuBtn = document.getElementById('menuBtn');
+menuBtn.addEventListener('click', () => document.body.classList.toggle('nav-open'));
+function closeNav() { document.body.classList.remove('nav-open'); }
+
+// ─── TREE STAGE ───────────────────────────────────────────────
+(function buildTrees() {
+  const stage = document.getElementById('treeStage');
+  const W = window.innerWidth;
+  const H = window.innerHeight;
+
+  function makeTree(scale, opacity) {
+    const ns = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(ns, 'svg');
+    svg.setAttribute('viewBox', '0 0 80 200');
+    svg.setAttribute('width', 80 * scale);
+    svg.setAttribute('height', 200 * scale);
+    svg.style.opacity = opacity;
+    svg.style.flexShrink = '0';
+    const trunk = document.createElementNS(ns, 'rect');
+    trunk.setAttribute('x', '32'); trunk.setAttribute('y', '150');
+    trunk.setAttribute('width', '16'); trunk.setAttribute('height', '50');
+    trunk.setAttribute('fill', 'rgba(8,8,8,0.95)');
+    svg.appendChild(trunk);
+    [[8, 150, 72, 80], [16, 110, 64, 60], [24, 75, 56, 45]].forEach(([x, y, w, h]) => {
+      const tri = document.createElementNS(ns, 'polygon');
+      tri.setAttribute('points', `${40},${y} ${x},${y+h} ${x+w},${y+h}`);
+      tri.setAttribute('fill', 'rgba(5,6,5,0.97)');
+      svg.appendChild(tri);
+    });
+    return svg;
+  }
+
+  const layers = [
+    { count: 12, scale: 0.4, y: 0.68, gap: W/10,  opacity: 0.3,  speed: 0.2 },
+    { count: 8,  scale: 0.7, y: 0.72, gap: W/7,   opacity: 0.5,  speed: 0.4 },
+    { count: 6,  scale: 1.1, y: 0.77, gap: W/5,   opacity: 0.7,  speed: 0.7 },
+    { count: 4,  scale: 1.7, y: 0.83, gap: W/3.5, opacity: 0.85, speed: 1.1 },
+    { count: 3,  scale: 2.6, y: 0.90, gap: W/2.2, opacity: 0.95, speed: 1.7 },
+  ];
+
+  const layerEls = layers.map(cfg => {
+    const wrap = document.createElement('div');
+    wrap.style.cssText = `position:absolute;bottom:0;left:0;width:${W*2.5}px;display:flex;align-items:flex-end;gap:0;`;
+    wrap.style.bottom = `${(1 - cfg.y) * H}px`;
+    for (let i = 0; i < cfg.count * 3; i++) {
+      const tree = makeTree(cfg.scale, cfg.opacity);
+      tree.style.marginLeft = `${cfg.gap * 0.3}px`;
+      wrap.appendChild(tree);
+    }
+    stage.appendChild(wrap);
+    return { el: wrap, cfg, xPos: 0 };
+  });
+
+  gsap.ticker.add(() => {
+    layerEls.forEach(layer => {
+      const treeW = 80 * layer.cfg.scale * 1.4;
+      const unitW = treeW + layer.cfg.gap * 0.3;
+      layer.xPos -= layer.cfg.speed;
+      if (Math.abs(layer.xPos) >= unitW * layer.cfg.count) layer.xPos += unitW * layer.cfg.count;
+      layer.el.style.transform = `translateX(${layer.xPos}px)`;
+    });
+  });
+
+  const fog = document.createElement('div');
+  fog.style.cssText = `position:absolute;bottom:0;left:0;right:0;height:35%;background:linear-gradient(to top,rgba(8,8,8,0.9),transparent);z-index:2;pointer-events:none;`;
+  stage.appendChild(fog);
+})();
+
+// ─── PROGRESS BAR ─────────────────────────────────────────────
+ScrollTrigger.create({
+  trigger: document.body, start: 'top top', end: 'bottom bottom',
+  onUpdate: self => { document.getElementById('progress-bar').style.width = (self.progress*100)+'%'; }
+});
+
+// ─── HERO REVEAL ──────────────────────────────────────────────
+const heroTl = gsap.timeline();
+heroTl
+  .set('#whoTitle', { opacity: 1 })
+  .fromTo('#whoLabel',  { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.55, ease: 'power3.out' })
+  .to('#whoTitle .line-inner', { y: '0%', duration: 0.85, ease: 'power4.out' }, '-=0.3')
+  .fromTo('#whoLines',  { opacity: 0 }, { opacity: 1, duration: 0.5 }, '-=0.3')
+  .fromTo('#whoSub',    { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.8 }, '-=0.2')
+  .fromTo('#whoScroll', { opacity: 0 }, { opacity: 1, duration: 0.5 }, '-=0.3')
+  .fromTo('.hero-deco', { opacity: 0, y: 20 }, { opacity: 1, y: 0, stagger: 0.08, duration: 0.7, ease: 'power3.out' }, '<-=1.0');
+
+// deco floating loop
+document.querySelectorAll('.hero-deco').forEach((d, i) => {
+  gsap.to(d, { y: `${-8-i*3}`, duration: 1.8+i*0.3, ease: 'sine.inOut', repeat: -1, yoyo: true, delay: i*0.2 });
+});
+
+// parallax on scroll
+gsap.to('#whoTitle', { scrollTrigger: { trigger: '.who-hero', start: 'top top', end: 'bottom top', scrub: 1.2 }, y: -130, ease: 'none' });
+
+// mouse parallax
+document.addEventListener('mousemove', e => {
+  const xp = (e.clientX/window.innerWidth-0.5)*30, yp = (e.clientY/window.innerHeight-0.5)*18;
+  gsap.to('#whoTitle', { x: xp*0.4, y: yp*0.3, duration: 1.2, ease: 'power2.out' });
+});
+
+['#wl1','#wl2','#wl3'].forEach((id, i) => {
+  gsap.to(id, { scaleX: 1.2, skewX: 4, duration: 0.8 + i*0.2, ease: 'sine.inOut', repeat: -1, yoyo: true, delay: i*0.18 });
+});
+
+// ─── GLANCE SECTION ───────────────────────────────────────────
+ScrollTrigger.create({
+  trigger: '.glance-section', start: 'top 75%',
+  onEnter: () => {
+    gsap.fromTo('#glanceLabel', { opacity: 0, y: 15 }, { opacity: 1, y: 0, duration: 0.6 });
+    gsap.fromTo('.glance-heading-inner', { y: '100%' }, { y: '0%', duration: 1, ease: 'power4.out', delay: 0.1 });
+    gsap.to('.glance-stat', { opacity: 1, y: 0, stagger: 0.15, duration: 0.8, ease: 'power3.out', delay: 0.3 });
+  }
+});
+
+// ─── SLOT-MACHINE TICKER + PROGRESS BARS ──────────────────────
+(function() {
+  // Build a slot-machine ticker for a .count-up element.
+  // Returns an array of the digit strip elements ready for GSAP animation.
+  function buildTicker(el) {
+    const digits = String(el.dataset.target).split('');
+    el.innerHTML = '';
+    const strips = [];
+    digits.forEach(function(digit) {
+      const col = document.createElement('span');
+      col.className = 'digit-col';
+      const strip = document.createElement('span');
+      strip.className = 'digit-strip';
+      // 3 full cycles (0-9) + the target digit as the final stop = 31 items
+      for (let r = 0; r < 3; r++) {
+        for (let d = 0; d <= 9; d++) {
+          const s = document.createElement('span');
+          s.textContent = d;
+          strip.appendChild(s);
+        }
+      }
+      const finalSpan = document.createElement('span');
+      finalSpan.textContent = digit;
+      strip.appendChild(finalSpan);
+      col.appendChild(strip);
+      el.appendChild(col);
+      strips.push(strip);
+    });
+    return strips;
+  }
+
+  document.querySelectorAll('.count-up').forEach(function(el) {
+    const strips = buildTicker(el);
+    const statCard = el.closest('.glance-stat');
+    const progressFill = statCard.querySelector('.glance-progress-fill');
+    const progressPct = parseInt(el.dataset.target); // use value directly as %
+
+    ScrollTrigger.create({
+      trigger: statCard,
+      start: 'top 85%',
+      once: true,
+      onEnter: function() {
+        // Each digit column spins through 30 items (30 × 1em) and lands on the 31st
+        strips.forEach(function(strip, i) {
+          gsap.fromTo(strip,
+            { y: '0em' },
+            { y: '-30em', duration: 1.6, ease: 'power4.out', delay: 0.4 + i * 0.07 }
+          );
+        });
+        // Progress bar fills simultaneously with the number
+        gsap.fromTo(progressFill,
+          { width: '0%' },
+          { width: progressPct + '%', duration: 1.6, ease: 'power2.out', delay: 0.4 }
+        );
+      }
+    });
+  });
+}());
+
+// ─── ABOUT ME SECTION ─────────────────────────────────────────
+gsap.set(['#aboutmeLabel','#aboutmeBody','#aboutmeTags'], { opacity: 0, y: 20 });
+gsap.set('.aboutme-heading-inner', { y: '100%' });
+gsap.set('#vinylWrap', { opacity: 0 });
+
+ScrollTrigger.create({
+  trigger: '.aboutme-section', start: 'top 70%',
+  onEnter: () => {
+    const tl = gsap.timeline();
+    tl.to('#aboutmeLabel',          { opacity: 1, y: 0, duration: 0.6 })
+      .to('.aboutme-heading-inner', { y: '0%', duration: 1, ease: 'power4.out' }, '-=0.2')
+      .to('#aboutmeBody',           { opacity: 1, y: 0, duration: 0.8 }, '-=0.5')
+      .to('#aboutmeTags',           { opacity: 1, y: 0, duration: 0.6 }, '-=0.4')
+      .to('#vinylWrap',             { opacity: 1, duration: 0.6, ease: 'power2.out' }, '-=0.6');
+  }
+});
+
+// ─── VINYL SCROLL ANIMATION ───────────────────────────────────
+const disc = document.getElementById('vinylDisc');
+disc.style.animation = 'none';
+
+let currentRotation = 0;
+const vinylStyles = getComputedStyle(document.getElementById('vinylWrap'));
+const vinylStartX = parseFloat(vinylStyles.getPropertyValue('--vinyl-start-x')) || 28;
+const vinylMaxX   = parseFloat(vinylStyles.getPropertyValue('--vinyl-max-x'))   || 160;
+let vinylX       = vinylStartX;
+let targetVinylX = vinylStartX;
+
+ScrollTrigger.create({
+  trigger: '.aboutme-section',
+  start: 'top center',
+  end: 'center center',
+  scrub: false,
+  onUpdate: self => {
+    targetVinylX = vinylStartX + (Math.min(self.progress, 1) * (vinylMaxX - vinylStartX));
+  }
+});
+
+gsap.ticker.add(() => {
+  vinylX += (targetVinylX - vinylX) * 0.12;
+  const spinAmount = (vinylX - vinylStartX) / Math.max(vinylMaxX - vinylStartX, 1);
+  currentRotation += 0.4 + spinAmount * 2;
+  gsap.set(disc, {
+    x: vinylX,
+    rotation: currentRotation,
+    transformOrigin: '50% 50%',
+  });
+});
+
+// ─── WORDS SECTION ────────────────────────────────────────────
+gsap.set(['#wordsLabel'], { opacity: 0, y: 15 });
+gsap.set('.words-heading-inner', { y: '100%' });
+ScrollTrigger.create({
+  trigger: '.words-section', start: 'top 75%',
+  onEnter: () => {
+    gsap.to('#wordsLabel', { opacity: 1, y: 0, duration: 0.6 });
+    gsap.fromTo('.words-heading-inner', { y: '100%' }, { y: '0%', duration: 1, ease: 'power4.out', delay: 0.1 });
+  }
+});
+
+// ─── QUOTES MARQUEE ───────────────────────────────────────────
+(function initQuotes() {
+  const wrap = document.querySelector('.quotes-track-wrap');
+  const track = document.getElementById('quotesTrack');
+  const baseCards = Array.from(track.children);
+  const baseMarkup = baseCards.map(el => el.outerHTML).join('');
+  const baseCount = baseCards.length;
+  const SPEED = 200;
+
+  let position = 0;
+  let baseWidth = 0;
+  let isDragging = false;
+  let dragStartX = 0;
+  let dragStartPos = 0;
+
+  function applyPosition(pos) {
+    if (baseWidth > 0) {
+      while (pos >= baseWidth * 2) pos -= baseWidth;
+      while (pos < baseWidth) pos += baseWidth;
+    }
+    position = pos;
+    track.style.transform = `translateX(-${position}px)`;
+  }
+
+  function buildLoop() {
+    track.innerHTML = baseMarkup + baseMarkup + baseMarkup;
+    while (track.scrollWidth < wrap.clientWidth * 4) {
+      track.insertAdjacentHTML('beforeend', baseMarkup);
+    }
+    baseWidth = Array.from(track.children)
+      .slice(0, baseCount)
+      .reduce((w, el) => w + el.getBoundingClientRect().width + 24, 0);
+    applyPosition(baseWidth);
+  }
+
+  buildLoop();
+  window.addEventListener('resize', buildLoop);
+
+  gsap.ticker.add((time, delta) => {
+    if (isDragging || baseWidth <= 0) return;
+    applyPosition(position + SPEED * (delta / 1000));
+  });
+
+  wrap.addEventListener('pointerdown', (e) => {
+    isDragging = true;
+    dragStartX = e.clientX;
+    dragStartPos = position;
+    wrap.setPointerCapture(e.pointerId);
+    wrap.classList.add('is-dragging');
+  });
+  wrap.addEventListener('pointermove', (e) => {
+    if (!isDragging) return;
+    applyPosition(dragStartPos - (e.clientX - dragStartX));
+  });
+  wrap.addEventListener('pointerup', () => { isDragging = false; wrap.classList.remove('is-dragging'); });
+  wrap.addEventListener('pointercancel', () => { isDragging = false; wrap.classList.remove('is-dragging'); });
+  wrap.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    const delta = Math.abs(e.deltaX) >= Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+    applyPosition(position + delta);
+  }, { passive: false });
+})();
+
+// ─── ROMAN COLUMNS ────────────────────────────────────────────
+(function() {
+  const bg = document.getElementById('romanBg');
+  const positions = [5, 12, 22, 35, 50, 65, 78, 88, 95];
+  const heights   = [180, 220, 160, 240, 200, 230, 170, 210, 185];
+  positions.forEach((left, i) => {
+    const col = document.createElement('div');
+    col.className = 'roman-col';
+    col.style.cssText = `left:${left}%;height:${heights[i]}px;`;
+    col.innerHTML = `<div class="roman-col-cap"></div><div class="roman-col-shaft" style="height:${heights[i]-34}px;"></div><div class="roman-col-base"></div>`;
+    bg.appendChild(col);
+  });
+  document.querySelectorAll('.roman-col').forEach((col, i) => {
+    gsap.to(col, {
+      scrollTrigger: { trigger: '.words-section', start: 'top bottom', end: 'bottom top', scrub: 1 },
+      y: -30 - (i % 3) * 15, ease: 'none'
+    });
+  });
+})();
+</script>
+
+<!-- ─── PAGE TRANSITIONS ────────────────────────────────────────────────────
+     Covers screen with an acid-green curtain on any internal link click.
+     Entry (300ms): curtain sweeps up from below to cover the screen.
+     Exit  (400ms): curtain continues up and off, revealing the new page.
+     Requires GSAP 3.x (already loaded above).
+──────────────────────────────────────────────────────────────────────────── -->
+<style>
+  #pg-curtain {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    background: #c8ff00;
+    will-change: transform;
+    pointer-events: none;
+    overflow: hidden;
+  }
+</style>
+<script>
+(function () {
+  'use strict';
+
+  /* ── config ──────────────────────────────────────────────── */
+  var T_IN  = 0.30;           /* s – curtain covers screen    */
+  var T_OUT = 0.40;           /* s – curtain clears screen    */
+  var EASE  = 'power3.inOut';
+  var KEY   = 'pg-transit';
+
+  /* ── build curtain element ───────────────────────────────── */
+  var el = document.createElement('div');
+  el.id  = 'pg-curtain';
+
+  /* noise texture — inline SVG, zero external requests */
+  el.innerHTML =
+    '<svg aria-hidden="true" focusable="false" ' +
+      'style="position:absolute;inset:0;width:100%;height:100%;' +
+             'opacity:.07;pointer-events:none" ' +
+      'xmlns="http://www.w3.org/2000/svg">' +
+      '<filter id="pg-noise">' +
+        '<feTurbulence type="fractalNoise" baseFrequency="0.68" ' +
+          'numOctaves="4" stitchTiles="stitch"/>' +
+      '</filter>' +
+      '<rect width="100%" height="100%" filter="url(#pg-noise)"/>' +
+    '</svg>';
+
+  document.body.appendChild(el);
+
+  /* ── entry animation ─────────────────────────────────────── */
+  if (sessionStorage.getItem(KEY)) {
+    sessionStorage.removeItem(KEY);
+    /* came from a transition → curtain is covering; sweep it out through the top */
+    gsap.fromTo(el, { yPercent: 0 }, { yPercent: -100, duration: T_OUT, ease: EASE, delay: 0.02 });
+  } else {
+    /* fresh load → park curtain below the viewport, invisible */
+    gsap.set(el, { yPercent: 100 });
+  }
+
+  /* ── intercept internal link clicks ─────────────────────── */
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest('a[href]');
+    if (!a) return;
+
+    var href = a.getAttribute('href');
+
+    /* skip: anchors, protocols, external, new-tab, modified clicks */
+    if (
+      !href ||
+      href.charAt(0) === '#' ||
+      /^(mailto|tel|javascript):/.test(href) ||
+      /^(https?:)?\/\//.test(href) ||
+      a.target === '_blank' ||
+      e.metaKey || e.ctrlKey || e.shiftKey || e.altKey
+    ) return;
+
+    e.preventDefault();
+
+    /* snap curtain below viewport, then sweep up to cover */
+    gsap.set(el, { yPercent: 100 });
+    gsap.to(el, {
+      yPercent: 0,
+      duration: T_IN,
+      ease: EASE,
+      onComplete: function () {
+        sessionStorage.setItem(KEY, '1');
+        window.location.href = href;
+      }
+    });
+  });
+
+}());
+</script>
+
+</body>
+</html>     
