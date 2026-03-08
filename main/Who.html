@@ -1122,7 +1122,7 @@ footer {
 <script>
 (function drawAlbumArt() {
   const canvas = document.getElementById('albumCanvas');
-  const COVER_SRC = 'assets/cover.png';
+  const COVER_SRC = '/assets/cover.png';
   const W = 640, H = 640;
   canvas.width = W; canvas.height = H;
   const ctx = canvas.getContext('2d');
@@ -1210,7 +1210,7 @@ footer {
 <script>
 (function initVinylPlayer() {
   const cover = document.getElementById('vinylCover');
-  const TRACK_SRC = 'assets/01_Do_I_Wanna_Know.mp3';
+  const TRACK_SRC = '/assets/do_i_wanna_know.mp3';
   const audio = new Audio(TRACK_SRC);
   audio.preload = 'metadata';
   audio.loop = true;
