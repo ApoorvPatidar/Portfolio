@@ -1,17 +1,5 @@
 {
-  "headers": [
-    {
-      "source": "/assets/:path*",
-      "headers": [
-        { "key": "Accept-Ranges", "value": "bytes" },
-        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
-      ]
-    }
-  ],
   "rewrites": [
     { "source": "/", "destination": "/Home.html" }
-  ],
-  "routes": [
-    { "src": "/assets/(.*)", "dest": "/assets/$1" }
   ]
 }
