@@ -10,5 +10,8 @@
   ],
   "rewrites": [
     { "source": "/", "destination": "/Home.html" }
+  ],
+  "routes": [
+    { "src": "/assets/(.*)", "dest": "/assets/$1" }
   ]
 }
