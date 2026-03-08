@@ -712,6 +712,11 @@ document.querySelectorAll('.footer-social-btn,.nav-social-btn').forEach(b=>{
     });
   });
 
+  /* ── bfcache back/forward: clear curtain if page is restored ── */
+  window.addEventListener('pageshow', function (e) {
+    if (e.persisted) { gsap.set(el, { yPercent: 100 }); }
+  });
+
 }());
 </script>
 
